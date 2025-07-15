@@ -1,4 +1,3 @@
-
 import {
   Sidebar,
   SidebarContent,
@@ -46,7 +45,6 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex justify-center p-6">
         <div className="flex items-center space-x-2">
-          <img src={kpcLogo} alt="KPC Logo" className="w-8 h-8" />
           {!collapsed && <span className="font-bold text-lg text-kpc-purple">Thank You Card System</span>}
         </div>
       </SidebarHeader>
