@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -188,179 +187,175 @@ const CombinedPage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-6">
         {/* New Request Section */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>New Thank You Card</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Recognize your colleagues for their outstanding work
-              </p>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="employee"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Employee</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an employee" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {employees.map((employee) => (
-                              <SelectItem key={employee.id} value={employee.id}>
-                                {employee.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="reason"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Reason for Recognition</FormLabel>
+        <Card>
+          <CardHeader>
+            <CardTitle>New Thank You Card</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Recognize your colleagues for their outstanding work
+            </p>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="employee"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Employee</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
                         <FormControl>
-                          <Textarea
-                            placeholder="Describe why this employee deserves recognition..."
-                            className="min-h-32"
-                            {...field}
-                          />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select an employee" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormDescription>
-                          Be specific about their achievements and impact
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-sm text-muted-foreground">
-                        Yearly Quota: {remainingQuota} out of {quota.total} remaining
-                      </span>
-                    </div>
-                    <Button 
-                      type="submit" 
-                      disabled={remainingQuota <= 0}
-                      className="bg-kpc-purple hover:bg-kpc-light-purple"
-                    >
-                      Submit Request
-                    </Button>
-                  </div>
-
-                  {remainingQuota <= 0 && (
-                    <Alert variant="destructive">
-                      <AlertTitle>Quota Reached</AlertTitle>
-                      <AlertDescription>
-                        You've reached your yearly quota for thank you cards. The quota resets at the beginning of each year.
-                      </AlertDescription>
-                    </Alert>
+                        <SelectContent>
+                          {employees.map((employee) => (
+                            <SelectItem key={employee.id} value={employee.id}>
+                              {employee.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
+                />
+
+                <FormField
+                  control={form.control}
+                  name="reason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Reason for Recognition</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Describe why this employee deserves recognition..."
+                          className="min-h-32"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Be specific about their achievements and impact
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-sm text-muted-foreground">
+                      Yearly Quota: {remainingQuota} out of {quota.total} remaining
+                    </span>
+                  </div>
+                  <Button 
+                    type="submit" 
+                    disabled={remainingQuota <= 0}
+                    className="bg-kpc-purple hover:bg-kpc-light-purple"
+                  >
+                    Submit Request
+                  </Button>
+                </div>
+
+                {remainingQuota <= 0 && (
+                  <Alert variant="destructive">
+                    <AlertTitle>Quota Reached</AlertTitle>
+                    <AlertDescription>
+                      You've reached your yearly quota for thank you cards. The quota resets at the beginning of each year.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
 
         {/* My Requests Section */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>My Requests</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Track and manage your thank you card requests
-              </p>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="all" value={selectedTab} onValueChange={setSelectedTab}>
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="pending">Pending</TabsTrigger>
-                  <TabsTrigger value="approved">Approved</TabsTrigger>
-                  <TabsTrigger value="rejected">Rejected</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value={selectedTab} className="mt-4">
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {filteredRequests.length === 0 ? (
-                      <div className="py-8 text-center">
-                        <p className="text-muted-foreground">No requests found</p>
-                      </div>
-                    ) : (
-                      filteredRequests.map((request) => (
-                        <Card 
-                          key={request.id} 
-                          className={`cursor-pointer ${selectedRequestId === request.id ? 'border-kpc-purple ring-1 ring-kpc-purple' : ''}`}
-                          onClick={() => handleCardSelect(request.id)}
-                        >
-                          <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start">
-                              <CardTitle className="text-sm font-medium">
-                                {request.employee.name}
-                              </CardTitle>
-                              <StatusBadge status={request.status} />
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {formatDate(request.submittedDate)}
-                            </p>
-                          </CardHeader>
-                          <CardContent className="pt-0">
-                            <p className="text-sm line-clamp-2 mb-3">
-                              {request.reason}
-                            </p>
-                            {request.status === "approved" && (
-                              <div className="flex flex-wrap gap-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>My Requests</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Track and manage your thank you card requests
+            </p>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="all" value={selectedTab} onValueChange={setSelectedTab}>
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+                <TabsTrigger value="approved">Approved</TabsTrigger>
+                <TabsTrigger value="rejected">Rejected</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value={selectedTab} className="mt-4">
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {filteredRequests.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <p className="text-muted-foreground">No requests found</p>
+                    </div>
+                  ) : (
+                    filteredRequests.map((request) => (
+                      <Card 
+                        key={request.id} 
+                        className={`cursor-pointer ${selectedRequestId === request.id ? 'border-kpc-purple ring-1 ring-kpc-purple' : ''}`}
+                        onClick={() => handleCardSelect(request.id)}
+                      >
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between items-start">
+                            <CardTitle className="text-sm font-medium">
+                              {request.employee.name}
+                            </CardTitle>
+                            <StatusBadge status={request.status} />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(request.submittedDate)}
+                          </p>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <p className="text-sm line-clamp-2 mb-3">
+                            {request.reason}
+                          </p>
+                          {request.status === "approved" && (
+                            <div className="flex flex-wrap gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownloadPDF(request.id);
+                                }}
+                              >
+                                PDF
+                              </Button>
+                              {!request.sent && (
                                 <Button 
                                   size="sm" 
-                                  variant="outline" 
+                                  className="bg-kpc-purple hover:bg-kpc-light-purple"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDownloadPDF(request.id);
+                                    handleSendToEmployee(request.id);
                                   }}
                                 >
-                                  PDF
+                                  Send
                                 </Button>
-                                {!request.sent && (
-                                  <Button 
-                                    size="sm" 
-                                    className="bg-kpc-purple hover:bg-kpc-light-purple"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleSendToEmployee(request.id);
-                                    }}
-                                  >
-                                    Send
-                                  </Button>
-                                )}
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))
-                    )}
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </div>
+                              )}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
 
       {selectedRequest && (
