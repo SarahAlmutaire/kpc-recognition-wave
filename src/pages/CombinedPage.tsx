@@ -182,9 +182,6 @@ const CombinedPage = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold mb-2">Recognition Dashboard</h2>
-        <p className="text-muted-foreground">
-          Submit new requests and track existing ones
-        </p>
       </div>
 
       <div className="space-y-6">
