@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Search, Download } from "lucide-react";
 import { toast } from "sonner";
 
@@ -61,6 +61,7 @@ const formatDate = (dateString: string) => {
 const EmployeeSubmissionsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
+  const selectAllRef = useRef<HTMLButtonElement>(null);
   
   const filteredSubmissions = mockSubmissions.filter(submission => {
     const searchLower = searchTerm.toLowerCase();
@@ -111,6 +112,13 @@ const EmployeeSubmissionsPage = () => {
 
   const isAllSelected = selectedSubmissions.length === filteredSubmissions.length && filteredSubmissions.length > 0;
   const isIndeterminate = selectedSubmissions.length > 0 && selectedSubmissions.length < filteredSubmissions.length;
+
+  // Set indeterminate state on the checkbox
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = isIndeterminate;
+    }
+  }, [isIndeterminate]);
   
   return (
     <div className="space-y-6">
@@ -160,9 +168,7 @@ const EmployeeSubmissionsPage = () => {
                 <Checkbox
                   checked={isAllSelected}
                   onCheckedChange={handleSelectAll}
-                  ref={(el) => {
-                    if (el) el.indeterminate = isIndeterminate;
-                  }}
+                  ref={selectAllRef}
                 />
               </TableHead>
               <TableHead>Employee</TableHead>
