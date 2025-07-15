@@ -43,7 +43,7 @@ export function AppSidebar() {
   ];
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader className="flex justify-center p-6">
         <div className="flex items-center space-x-2">
           <img src={kpcLogo} alt="KPC Logo" className="w-8 h-8" />
