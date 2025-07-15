@@ -180,10 +180,6 @@ const CombinedPage = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold mb-2">Recognition Dashboard</h2>
-      </div>
-
       <div className="space-y-6">
         {/* New Request Section */}
         <Card>
