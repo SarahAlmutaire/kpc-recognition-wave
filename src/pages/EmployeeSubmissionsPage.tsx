@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ interface Submission {
   date: string;
   status: "pending" | "approved" | "rejected";
   department: string;
+  exportStatus: "ready" | "exported";
 }
 
 const mockSubmissions: Submission[] = [
@@ -29,6 +31,7 @@ const mockSubmissions: Submission[] = [
     date: "2024-01-20",
     status: "pending",
     department: "HR",
+    exportStatus: "ready",
   },
   {
     id: "2",
@@ -36,6 +39,7 @@ const mockSubmissions: Submission[] = [
     date: "2024-01-15",
     status: "approved",
     department: "Finance",
+    exportStatus: "ready",
   },
   {
     id: "3",
@@ -43,6 +47,7 @@ const mockSubmissions: Submission[] = [
     date: "2024-01-10",
     status: "rejected",
     department: "IT",
+    exportStatus: "exported",
   },
   {
     id: "4",
@@ -50,6 +55,7 @@ const mockSubmissions: Submission[] = [
     date: "2024-01-05",
     status: "pending",
     department: "Marketing",
+    exportStatus: "ready",
   },
 ];
 
@@ -111,7 +117,7 @@ export default function EmployeeSubmissionsPage() {
   const handleBulkApprove = () => {
     const updatedSubmissions = submissions.map((submission) => {
       if (selectedSubmissions.includes(submission.id)) {
-        return { ...submission, status: "approved" };
+        return { ...submission, status: "approved" as const };
       }
       return submission;
     });
@@ -121,13 +127,48 @@ export default function EmployeeSubmissionsPage() {
     toast.success("Selected submissions approved!");
   };
 
+  const handleExportAll = () => {
+    // Create CSV content
+    const headers = ["Employee", "Date", "Status", "Department", "Export Status"];
+    const csvContent = [
+      headers.join(","),
+      ...submissions.map(submission => [
+        submission.employee,
+        submission.date,
+        submission.status,
+        submission.department,
+        submission.exportStatus
+      ].join(","))
+    ].join("\n");
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `employee_submissions_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Update export status
+    const updatedSubmissions = submissions.map(submission => ({
+      ...submission,
+      exportStatus: "exported" as const
+    }));
+    setSubmissions(updatedSubmissions);
+    
+    toast.success("All submissions exported to Excel!");
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <CardTitle className="text-2xl">Employee Submissions</CardTitle>
-        <Button>
+        <Button onClick={handleExportAll}>
           <Download className="w-4 h-4 mr-2" />
-          Download All
+          Export All to Excel
         </Button>
       </div>
 
@@ -196,6 +237,9 @@ export default function EmployeeSubmissionsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Department
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Export Status
+                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -225,6 +269,17 @@ export default function EmployeeSubmissionsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">{submission.department}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Badge
+                        className={
+                          submission.exportStatus === "ready"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                        }
+                      >
+                        {submission.exportStatus === "ready" ? "Ready to Export" : "Exported"}
+                      </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <Button size="sm" variant="outline">
