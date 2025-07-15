@@ -15,7 +15,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <main className="flex-1 p-6">
           <div className="flex items-center justify-between mb-6">
             <SidebarTrigger className="lg:hidden" />
-            <h1 className="text-2xl font-bold text-kpc-purple">Thank You Card System</h1>
+            <h1 className="text-2xl font-bold text-kpc-purple">TYCS</h1>
           </div>
           <div className="animate-fade-in">
             {children}

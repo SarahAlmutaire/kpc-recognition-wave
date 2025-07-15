@@ -48,7 +48,7 @@ export function AppSidebar() {
       <SidebarHeader className="flex justify-center p-6">
         <div className="flex items-center space-x-2">
           <img src={kpcLogo} alt="KPC Logo" className="w-8 h-8" />
-          <span className="font-bold text-lg text-kpc-purple">KPC Recognition</span>
+          <span className="font-bold text-lg text-kpc-purple">TYCS</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
