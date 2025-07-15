@@ -55,11 +55,18 @@ export default function EmployeeSubmissionsPage() {
   const [submissions, setSubmissions] = useState(mockSubmissions);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredSubmissions = submissions.filter((submission) =>
-    submission.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    submission.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    submission.mobileNumber.includes(searchQuery)
-  );
+  const filteredSubmissions = submissions
+    .filter((submission) =>
+      submission.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      submission.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      submission.mobileNumber.includes(searchQuery)
+    )
+    .sort((a, b) => {
+      // Convert date strings to Date objects for proper sorting
+      const dateA = new Date(a.submittedDate);
+      const dateB = new Date(b.submittedDate);
+      return dateB.getTime() - dateA.getTime(); // Descending order (newest first)
+    });
 
   const handleExportToExcel = () => {
     // Create CSV content
