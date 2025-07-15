@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { CalendarIcon, FileTextIcon, UserIcon, UsersIcon } from "lucide-react";
+import { CheckIcon, FileTextIcon, UserIcon, UsersIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import kpcLogo from "@/assets/kpc-logo.png";
 
@@ -33,7 +33,7 @@ export function AppSidebar() {
     {
       title: "HR Approvals",
       path: "/approvals",
-      icon: CalendarIcon,
+      icon: CheckIcon,
     },
     {
       title: "Employee Submissions",
