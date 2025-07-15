@@ -61,7 +61,7 @@ const formatDate = (dateString: string) => {
 const EmployeeSubmissionsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
-  const selectAllRef = useRef<HTMLButtonElement>(null);
+  const selectAllRef = useRef<HTMLInputElement>(null);
   
   const filteredSubmissions = mockSubmissions.filter(submission => {
     const searchLower = searchTerm.toLowerCase();
