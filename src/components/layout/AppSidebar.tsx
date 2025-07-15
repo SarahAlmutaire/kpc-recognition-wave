@@ -9,7 +9,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { CalendarIcon, FileTextIcon, UserIcon, UsersIcon } from "lucide-react";
@@ -50,7 +49,6 @@ export function AppSidebar() {
           <img src={kpcLogo} alt="KPC Logo" className="w-8 h-8" />
           {!collapsed && <span className="font-bold text-lg text-kpc-purple">TYCS</span>}
         </div>
-        <SidebarTrigger className="ml-auto" />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
