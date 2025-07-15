@@ -1,11 +1,11 @@
 
-import RequestPage from "./RequestPage";
+import CombinedPage from "./CombinedPage";
 import { MainLayout } from "@/components/layout/MainLayout";
 
 const Index = () => {
   return (
     <MainLayout>
-      <RequestPage />
+      <CombinedPage />
     </MainLayout>
   );
 };
