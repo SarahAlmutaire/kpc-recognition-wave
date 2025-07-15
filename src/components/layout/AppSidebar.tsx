@@ -9,12 +9,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { CalendarIcon, FileTextIcon, SearchIcon, UserIcon, UsersIcon } from "lucide-react";
+import { CalendarIcon, FileTextIcon, UserIcon, UsersIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import kpcLogo from "@/assets/kpc-logo.png";
 
 export function AppSidebar() {
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
+
   const menuItems = [
     {
       title: "New Request",
@@ -36,11 +41,6 @@ export function AppSidebar() {
       path: "/submissions",
       icon: UsersIcon,
     },
-    {
-      title: "Reports & Export",
-      path: "/reports",
-      icon: SearchIcon,
-    },
   ];
 
   return (
@@ -48,12 +48,13 @@ export function AppSidebar() {
       <SidebarHeader className="flex justify-center p-6">
         <div className="flex items-center space-x-2">
           <img src={kpcLogo} alt="KPC Logo" className="w-8 h-8" />
-          <span className="font-bold text-lg text-kpc-purple">TYCS</span>
+          {!collapsed && <span className="font-bold text-lg text-kpc-purple">TYCS</span>}
         </div>
+        <SidebarTrigger className="ml-auto" />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          {!collapsed && <SidebarGroupLabel>Navigation</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -70,7 +71,7 @@ export function AppSidebar() {
                       }
                     >
                       <item.icon className="w-5 h-5" />
-                      <span>{item.title}</span>
+                      {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

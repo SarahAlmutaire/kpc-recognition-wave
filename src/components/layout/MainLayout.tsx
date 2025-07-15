@@ -1,27 +1,23 @@
 
-import { ReactNode } from "react";
 import { AppSidebar } from "./AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
 interface MainLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AppSidebar />
+    <div className="flex min-h-screen w-full">
+      <AppSidebar />
+      <SidebarInset className="flex-1">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+        </header>
         <main className="flex-1 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <SidebarTrigger className="lg:hidden" />
-            <h1 className="text-2xl font-bold text-kpc-purple">TYCS</h1>
-          </div>
-          <div className="animate-fade-in">
-            {children}
-          </div>
+          {children}
         </main>
-      </div>
-    </SidebarProvider>
+      </SidebarInset>
+    </div>
   );
 }

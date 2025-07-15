@@ -10,8 +10,10 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Download } from "lucide-react";
+import { toast } from "sonner";
 
 // Mock data for employee submissions
 const mockSubmissions = [
@@ -58,6 +60,7 @@ const formatDate = (dateString: string) => {
 
 const EmployeeSubmissionsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
   
   const filteredSubmissions = mockSubmissions.filter(submission => {
     const searchLower = searchTerm.toLowerCase();
@@ -67,11 +70,47 @@ const EmployeeSubmissionsPage = () => {
       submission.mobileNumber.includes(searchTerm)
     );
   });
-  
-  const handleExportToExcel = () => {
-    console.log("Exporting to Excel...");
-    // Implementation would be added here
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedSubmissions(filteredSubmissions.map(submission => submission.id));
+    } else {
+      setSelectedSubmissions([]);
+    }
   };
+
+  const handleSelectSubmission = (submissionId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedSubmissions(prev => [...prev, submissionId]);
+    } else {
+      setSelectedSubmissions(prev => prev.filter(id => id !== submissionId));
+    }
+  };
+
+  const handleExportSelected = () => {
+    if (selectedSubmissions.length === 0) {
+      toast.error("Please select submissions to export");
+      return;
+    }
+    
+    const selectedData = mockSubmissions.filter(submission => 
+      selectedSubmissions.includes(submission.id)
+    );
+    
+    console.log("Exporting selected submissions:", selectedData);
+    toast.success(`Exported ${selectedSubmissions.length} submission(s) to Excel`);
+    
+    // Here you would implement actual Excel export logic
+    // For now, we'll just show a success message
+  };
+
+  const handleExportAll = () => {
+    console.log("Exporting all submissions:", filteredSubmissions);
+    toast.success(`Exported ${filteredSubmissions.length} submission(s) to Excel`);
+  };
+
+  const isAllSelected = selectedSubmissions.length === filteredSubmissions.length && filteredSubmissions.length > 0;
+  const isIndeterminate = selectedSubmissions.length > 0 && selectedSubmissions.length < filteredSubmissions.length;
   
   return (
     <div className="space-y-6">
@@ -82,7 +121,7 @@ const EmployeeSubmissionsPage = () => {
         </p>
       </div>
       
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -93,18 +132,39 @@ const EmployeeSubmissionsPage = () => {
           />
         </div>
         
-        <Button 
-          onClick={handleExportToExcel}
-          className="bg-kpc-purple hover:bg-kpc-light-purple"
-        >
-          Export to Excel
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleExportSelected}
+            disabled={selectedSubmissions.length === 0}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Export Selected ({selectedSubmissions.length})
+          </Button>
+          <Button 
+            onClick={handleExportAll}
+            className="bg-kpc-purple hover:bg-kpc-light-purple flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Export All
+          </Button>
+        </div>
       </div>
       
       <div className="border rounded-md">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={isAllSelected}
+                  onCheckedChange={handleSelectAll}
+                  ref={(el) => {
+                    if (el) el.indeterminate = isIndeterminate;
+                  }}
+                />
+              </TableHead>
               <TableHead>Employee</TableHead>
               <TableHead>Department</TableHead>
               <TableHead>Mobile Number</TableHead>
@@ -115,13 +175,21 @@ const EmployeeSubmissionsPage = () => {
           <TableBody>
             {filteredSubmissions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6">
+                <TableCell colSpan={6} className="text-center py-6">
                   No submissions found
                 </TableCell>
               </TableRow>
             ) : (
               filteredSubmissions.map((submission) => (
                 <TableRow key={submission.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedSubmissions.includes(submission.id)}
+                      onCheckedChange={(checked) => 
+                        handleSelectSubmission(submission.id, checked as boolean)
+                      }
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{submission.employee.name}</TableCell>
                   <TableCell>{submission.employee.department}</TableCell>
                   <TableCell>{submission.mobileNumber}</TableCell>
