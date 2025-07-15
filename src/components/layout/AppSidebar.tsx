@@ -59,7 +59,10 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton 
+                    asChild
+                    tooltip={collapsed ? item.title : undefined}
+                  >
                     <NavLink
                       to={item.path}
                       className={({ isActive }) =>

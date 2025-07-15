@@ -1,224 +1,250 @@
-
+import React, { useState, useRef, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState, useRef, useEffect } from "react";
-import { Search, Download } from "lucide-react";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Search, Download, Filter, Eye, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 
-// Mock data for employee submissions
-const mockSubmissions = [
+interface Submission {
+  id: string;
+  employee: string;
+  date: string;
+  status: "pending" | "approved" | "rejected";
+  department: string;
+}
+
+const mockSubmissions: Submission[] = [
   {
     id: "1",
-    employee: { id: "1", name: "Ahmed Al-Sabah", department: "IT" },
-    mobileNumber: "965-5555-1234",
-    submittedDate: "2023-04-25T14:30:00",
-    exported: true,
+    employee: "John Doe",
+    date: "2024-01-20",
+    status: "pending",
+    department: "HR",
   },
   {
     id: "2",
-    employee: { id: "2", name: "Fatima Al-Ahmed", department: "Finance" },
-    mobileNumber: "965-5555-5678",
-    submittedDate: "2023-04-26T10:15:00",
-    exported: false,
+    employee: "Jane Smith",
+    date: "2024-01-15",
+    status: "approved",
+    department: "Finance",
   },
   {
     id: "3",
-    employee: { id: "3", name: "Mohammed Al-Rashid", department: "HR" },
-    mobileNumber: "965-5555-9876",
-    submittedDate: "2023-04-27T09:45:00",
-    exported: false,
+    employee: "Alice Johnson",
+    date: "2024-01-10",
+    status: "rejected",
+    department: "IT",
   },
   {
     id: "4",
-    employee: { id: "4", name: "Sara Al-Mutawa", department: "Marketing" },
-    mobileNumber: "965-5555-4321",
-    submittedDate: "2023-04-28T16:20:00",
-    exported: false,
+    employee: "Bob Williams",
+    date: "2024-01-05",
+    status: "pending",
+    department: "Marketing",
   },
 ];
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  }).format(date);
-};
-
-const EmployeeSubmissionsPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+export default function EmployeeSubmissionsPage() {
+  const [submissions, setSubmissions] = useState(mockSubmissions);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "approved" | "rejected">("all");
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
+  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>(submissions);
+
   const selectAllRef = useRef<HTMLInputElement>(null);
-  
-  const filteredSubmissions = mockSubmissions.filter(submission => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      submission.employee.name.toLowerCase().includes(searchLower) ||
-      submission.employee.department.toLowerCase().includes(searchLower) ||
-      submission.mobileNumber.includes(searchTerm)
-    );
-  });
+
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery, filterStatus, submissions]);
+
+  const applyFilters = () => {
+    let filtered = submissions;
+
+    if (searchQuery) {
+      filtered = filtered.filter((submission) =>
+        submission.employee.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (filterStatus !== "all") {
+      filtered = filtered.filter((submission) => submission.status === filterStatus);
+    }
+
+    setFilteredSubmissions(filtered);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleStatusFilterChange = (value: "all" | "pending" | "approved" | "rejected") => {
+    setFilterStatus(value);
+  };
+
+  const handleSubmissionSelect = (id: string) => {
+    setSelectedSubmissions((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedSubmissions(filteredSubmissions.map(submission => submission.id));
+      setSelectedSubmissions(filteredSubmissions.map((submission) => submission.id));
     } else {
       setSelectedSubmissions([]);
     }
   };
 
-  const handleSelectSubmission = (submissionId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedSubmissions(prev => [...prev, submissionId]);
-    } else {
-      setSelectedSubmissions(prev => prev.filter(id => id !== submissionId));
-    }
+  const handleBulkApprove = () => {
+    const updatedSubmissions = submissions.map((submission) => {
+      if (selectedSubmissions.includes(submission.id)) {
+        return { ...submission, status: "approved" };
+      }
+      return submission;
+    });
+
+    setSubmissions(updatedSubmissions);
+    setSelectedSubmissions([]);
+    toast.success("Selected submissions approved!");
   };
 
-  const handleExportSelected = () => {
-    if (selectedSubmissions.length === 0) {
-      toast.error("Please select submissions to export");
-      return;
-    }
-    
-    const selectedData = mockSubmissions.filter(submission => 
-      selectedSubmissions.includes(submission.id)
-    );
-    
-    console.log("Exporting selected submissions:", selectedData);
-    toast.success(`Exported ${selectedSubmissions.length} submission(s) to Excel`);
-    
-    // Here you would implement actual Excel export logic
-    // For now, we'll just show a success message
-  };
-
-  const handleExportAll = () => {
-    console.log("Exporting all submissions:", filteredSubmissions);
-    toast.success(`Exported ${filteredSubmissions.length} submission(s) to Excel`);
-  };
-
-  const isAllSelected = selectedSubmissions.length === filteredSubmissions.length && filteredSubmissions.length > 0;
-  const isIndeterminate = selectedSubmissions.length > 0 && selectedSubmissions.length < filteredSubmissions.length;
-
-  // Set indeterminate state on the checkbox
-  useEffect(() => {
-    if (selectAllRef.current) {
-      selectAllRef.current.indeterminate = isIndeterminate;
-    }
-  }, [isIndeterminate]);
-  
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold mb-2">Employee Mobile Submissions</h2>
-        <p className="text-muted-foreground">
-          Track mobile numbers submitted by employees for follow-up
-        </p>
+      <div className="flex items-center justify-between">
+        <CardTitle className="text-2xl">Employee Submissions</CardTitle>
+        <Button>
+          <Download className="w-4 h-4 mr-2" />
+          Download All
+        </Button>
       </div>
-      
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, department, or number..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <Button 
-            onClick={handleExportSelected}
-            disabled={selectedSubmissions.length === 0}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Export Selected ({selectedSubmissions.length})
-          </Button>
-          <Button 
-            onClick={handleExportAll}
-            className="bg-kpc-purple hover:bg-kpc-light-purple flex items-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Export All
-          </Button>
-        </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Input
+          type="search"
+          placeholder="Search employee..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="md:w-auto"
+        />
+        <Select onValueChange={handleStatusFilterChange} defaultValue={filterStatus}>
+          <SelectTrigger className="w-full md:w-auto">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      
-      <div className="border rounded-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
+
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle>Employee Submissions</CardTitle>
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <Checkbox
-                  checked={isAllSelected}
-                  onCheckedChange={handleSelectAll}
                   ref={selectAllRef}
+                  checked={selectedSubmissions.length === filteredSubmissions.length}
+                  onCheckedChange={handleSelectAll}
                 />
-              </TableHead>
-              <TableHead>Employee</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Mobile Number</TableHead>
-              <TableHead>Submitted Date</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredSubmissions.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-6">
-                  No submissions found
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredSubmissions.map((submission) => (
-                <TableRow key={submission.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedSubmissions.includes(submission.id)}
-                      onCheckedChange={(checked) => 
-                        handleSelectSubmission(submission.id, checked as boolean)
-                      }
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{submission.employee.name}</TableCell>
-                  <TableCell>{submission.employee.department}</TableCell>
-                  <TableCell>{submission.mobileNumber}</TableCell>
-                  <TableCell>{formatDate(submission.submittedDate)}</TableCell>
-                  <TableCell>
-                    {submission.exported ? (
-                      <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-                        Exported
+                <span className="text-sm text-muted-foreground">
+                  Select All ({filteredSubmissions.length})
+                </span>
+              </div>
+              {selectedSubmissions.length > 0 && (
+                <Button 
+                  onClick={handleBulkApprove}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCheck className="w-4 h-4 mr-2" />
+                  Approve Selected ({selectedSubmissions.length})
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Employee
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Department
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredSubmissions.map((submission) => (
+                  <tr key={submission.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{submission.employee}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{submission.date}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Badge
+                        className={
+                          submission.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : submission.status === "approved"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }
+                      >
+                        {submission.status}
                       </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-600 border-yellow-200">
-                        Pending
-                      </Badge>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{submission.department}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <Button size="sm" variant="outline">
+                        <Eye className="w-4 h-4 mr-2" />
+                        View
+                      </Button>
+                      <Checkbox
+                        checked={selectedSubmissions.includes(submission.id)}
+                        onCheckedChange={() => handleSubmissionSelect(submission.id)}
+                        id={`submission-${submission.id}`}
+                        className="ml-2"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default EmployeeSubmissionsPage;
+}
