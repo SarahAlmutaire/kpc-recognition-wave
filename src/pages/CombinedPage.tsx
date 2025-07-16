@@ -22,11 +22,20 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { CardPreview } from "@/components/cards/CardPreview";
+import { Plus } from "lucide-react";
 
 // Mock data for employees
 const employees = [
@@ -141,6 +150,7 @@ const CombinedPage = () => {
 
   const [selectedTab, setSelectedTab] = useState("all");
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -160,6 +170,7 @@ const CombinedPage = () => {
     toast.success("Thank you card request submitted successfully!");
     console.log(values);
     form.reset();
+    setIsDialogOpen(false);
   };
 
   const handleSendToEmployee = (requestId: string) => {
@@ -180,16 +191,29 @@ const CombinedPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-6">
-        {/* New Request Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>New Thank You Card</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Recognize your colleagues for their outstanding work
-            </p>
-          </CardHeader>
-          <CardContent>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold mb-2">Thank You Cards</h2>
+          <p className="text-muted-foreground">
+            Recognize your colleagues and track your requests
+          </p>
+        </div>
+        
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-kpc-purple hover:bg-kpc-light-purple">
+              <Plus className="w-4 h-4 mr-2" />
+              New Request
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>New Thank You Card</DialogTitle>
+              <DialogDescription>
+                Recognize your colleagues for their outstanding work
+              </DialogDescription>
+            </DialogHeader>
+            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
@@ -266,80 +290,80 @@ const CombinedPage = () => {
                 )}
               </form>
             </Form>
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-        {/* My Requests Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>My Requests</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Track and manage your thank you card requests
-            </p>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="all" value={selectedTab} onValueChange={setSelectedTab}>
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="pending">Pending</TabsTrigger>
-                <TabsTrigger value="approved">Approved</TabsTrigger>
-                <TabsTrigger value="rejected">Rejected</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value={selectedTab} className="mt-4">
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {filteredRequests.length === 0 ? (
-                    <div className="py-8 text-center">
-                      <p className="text-muted-foreground">No requests found</p>
-                    </div>
-                  ) : (
-                    filteredRequests.map((request) => (
-                      <Card 
-                        key={request.id} 
-                        className={`cursor-pointer ${selectedRequestId === request.id ? 'border-kpc-purple ring-1 ring-kpc-purple' : ''}`}
-                        onClick={() => handleCardSelect(request.id)}
-                      >
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-start">
-                            <CardTitle className="text-sm font-medium">
-                              {request.employee.name}
-                            </CardTitle>
-                            <StatusBadge status={request.status} />
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {formatDate(request.submittedDate)}
-                          </p>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <p className="text-sm line-clamp-2 mb-3">
-                            {request.reason}
-                          </p>
-                          {request.status === "approved" && (
-                            <div className="flex flex-wrap gap-2">
+      {/* My Requests Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>My Requests</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Track and manage your thank you card requests
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="all" value={selectedTab} onValueChange={setSelectedTab}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="approved">Approved</TabsTrigger>
+              <TabsTrigger value="rejected">Rejected</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value={selectedTab} className="mt-4">
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {filteredRequests.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <p className="text-muted-foreground">No requests found</p>
+                  </div>
+                ) : (
+                  filteredRequests.map((request) => (
+                    <Card 
+                      key={request.id} 
+                      className={`cursor-pointer ${selectedRequestId === request.id ? 'border-kpc-purple ring-1 ring-kpc-purple' : ''}`}
+                      onClick={() => handleCardSelect(request.id)}
+                    >
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <CardTitle className="text-sm font-medium">
+                            {request.employee.name}
+                          </CardTitle>
+                          <StatusBadge status={request.status} />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(request.submittedDate)}
+                        </p>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <p className="text-sm line-clamp-2 mb-3">
+                          {request.reason}
+                        </p>
+                        {request.status === "approved" && (
+                          <div className="flex flex-wrap gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadPDF(request.id);
+                              }}
+                            >
+                              PDF
+                            </Button>
+                            {!request.sent && (
                               <Button 
                                 size="sm" 
-                                variant="outline" 
+                                className="bg-kpc-purple hover:bg-kpc-light-purple"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDownloadPDF(request.id);
+                                  handleSendToEmployee(request.id);
                                 }}
                               >
-                                PDF
+                                Send
                               </Button>
-                              {!request.sent && (
-                                <Button 
-                                  size="sm" 
-                                  className="bg-kpc-purple hover:bg-kpc-light-purple"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleSendToEmployee(request.id);
-                                  }}
-                                >
-                                  Send
-                                </Button>
-                              )}
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </CardContent>
                       </Card>
                     ))
@@ -349,7 +373,6 @@ const CombinedPage = () => {
             </Tabs>
           </CardContent>
         </Card>
-      </div>
 
       {selectedRequest && (
         <div className="animate-fade-in">
