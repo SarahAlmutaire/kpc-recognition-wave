@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -364,15 +365,16 @@ const CombinedPage = () => {
                               </Button>
                             )}
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
 
       {selectedRequest && (
         <div className="animate-fade-in">
