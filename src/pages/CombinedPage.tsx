@@ -194,9 +194,6 @@ const CombinedPage = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold mb-2">Thank You Cards</h2>
-          <p className="text-muted-foreground">
-            Recognize your colleagues and track your requests
-          </p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
