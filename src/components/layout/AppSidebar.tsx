@@ -1,3 +1,4 @@
+
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { CheckIcon, FileTextIcon, UserIcon, UsersIcon } from "lucide-react";
+import { CheckIcon, FileTextIcon, UsersIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import kpcLogo from "@/assets/kpc-logo.png";
 
@@ -23,11 +24,6 @@ export function AppSidebar() {
       title: "New Request",
       path: "/",
       icon: FileTextIcon,
-    },
-    {
-      title: "My Requests",
-      path: "/my-requests",
-      icon: UserIcon,
     },
     {
       title: "HR Approvals",
