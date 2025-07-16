@@ -26,14 +26,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -54,23 +49,30 @@ const mockRequests = [
   {
     id: "1",
     employee: "Ahmed Al-Sabah",
-    reason: "Exceptional work on the quarterly report presentation",
-    status: "Pending",
-    submittedDate: "2024-01-15",
+    reason: "For leading the team during the system migration project with exceptional dedication and ensuring zero downtime.",
+    status: "Approved",
+    submittedDate: "Apr 28, 2023",
   },
   {
     id: "2",
-    employee: "Fatima Al-Ahmed",
-    reason: "Outstanding customer service during the crisis",
-    status: "Approved",
-    submittedDate: "2024-01-10",
+    employee: "Mohammed Al-Rashid",
+    reason: "For his outstanding contribution to the quarterly financial report, delivering it ahead of schedule with comprehensive analysis.",
+    status: "Pending",
+    submittedDate: "May 1, 2023",
   },
   {
     id: "3",
-    employee: "Mohammed Al-Rashid",
-    reason: "Innovative solution for the software bug",
+    employee: "Sara Al-Mutawa",
+    reason: "For implementing a new process that improved the department's efficiency by 25% and reduced processing time significantly.",
     status: "Rejected",
-    submittedDate: "2024-01-08",
+    submittedDate: "Apr 20, 2023",
+  },
+  {
+    id: "4",
+    employee: "Fatima Al-Ahmed",
+    reason: "For her exceptional client management during the recent project delivery, receiving positive feedback from all stakeholders.",
+    status: "Approved",
+    submittedDate: "Apr 15, 2023",
   },
 ];
 
@@ -92,6 +94,7 @@ const CombinedPage = () => {
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -110,18 +113,23 @@ const CombinedPage = () => {
 
   const remainingQuota = quota.total - quota.used;
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case "Approved":
-        return "text-green-600";
+        return <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100">Approved</Badge>;
       case "Rejected":
-        return "text-red-600";
+        return <Badge variant="destructive">Rejected</Badge>;
       case "Pending":
-        return "text-yellow-600";
+        return <Badge variant="secondary">Pending</Badge>;
       default:
-        return "text-gray-600";
+        return <Badge variant="secondary">{status}</Badge>;
     }
   };
+
+  const filteredRequests = mockRequests.filter(request => {
+    if (activeTab === "all") return true;
+    return request.status.toLowerCase() === activeTab;
+  });
 
   return (
     <div className="space-y-6">
@@ -219,34 +227,55 @@ const CombinedPage = () => {
         </Dialog>
       </div>
 
-      {/* Requests Grid */}
+      {/* My Requests Section */}
       <div className="bg-white rounded-lg border shadow-sm">
         <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">My Requests</h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Employee</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Submitted Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockRequests.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell className="font-medium">{request.employee}</TableCell>
-                  <TableCell className="max-w-xs truncate">{request.reason}</TableCell>
-                  <TableCell>
-                    <span className={`font-medium ${getStatusColor(request.status)}`}>
-                      {request.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{request.submittedDate}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">My Requests</h3>
+            <p className="text-sm text-muted-foreground">Track and manage your thank you card requests</p>
+          </div>
+          
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="approved">Approved</TabsTrigger>
+              <TabsTrigger value="rejected">Rejected</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value={activeTab} className="mt-6">
+              <div className="space-y-4">
+                {filteredRequests.map((request) => (
+                  <Card key={request.id} className="border">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h4 className="font-semibold text-lg">{request.employee}</h4>
+                          <p className="text-sm text-muted-foreground">{request.submittedDate}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {getStatusBadge(request.status)}
+                          {request.status === "Approved" && (
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm">PDF</Button>
+                              <Button size="sm" className="bg-kpc-purple hover:bg-kpc-light-purple">Send</Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">{request.reason}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+                
+                {filteredRequests.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No requests found for this status.
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
