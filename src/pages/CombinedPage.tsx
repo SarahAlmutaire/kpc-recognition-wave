@@ -26,6 +26,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -39,6 +47,31 @@ const employees = [
   { id: "3", name: "Mohammed Al-Rashid" },
   { id: "4", name: "Sara Al-Mutawa" },
   { id: "5", name: "Nasser Al-Salem" },
+];
+
+// Mock data for requests
+const mockRequests = [
+  {
+    id: "1",
+    employee: "Ahmed Al-Sabah",
+    reason: "Exceptional work on the quarterly report presentation",
+    status: "Pending",
+    submittedDate: "2024-01-15",
+  },
+  {
+    id: "2",
+    employee: "Fatima Al-Ahmed",
+    reason: "Outstanding customer service during the crisis",
+    status: "Approved",
+    submittedDate: "2024-01-10",
+  },
+  {
+    id: "3",
+    employee: "Mohammed Al-Rashid",
+    reason: "Innovative solution for the software bug",
+    status: "Rejected",
+    submittedDate: "2024-01-08",
+  },
 ];
 
 const formSchema = z.object({
@@ -76,6 +109,19 @@ const CombinedPage = () => {
   };
 
   const remainingQuota = quota.total - quota.used;
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Approved":
+        return "text-green-600";
+      case "Rejected":
+        return "text-red-600";
+      case "Pending":
+        return "text-yellow-600";
+      default:
+        return "text-gray-600";
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -171,6 +217,37 @@ const CombinedPage = () => {
             </Form>
           </DialogContent>
         </Dialog>
+      </div>
+
+      {/* Requests Grid */}
+      <div className="bg-white rounded-lg border shadow-sm">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold mb-4">My Requests</h3>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Employee</TableHead>
+                <TableHead>Reason</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Submitted Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {mockRequests.map((request) => (
+                <TableRow key={request.id}>
+                  <TableCell className="font-medium">{request.employee}</TableCell>
+                  <TableCell className="max-w-xs truncate">{request.reason}</TableCell>
+                  <TableCell>
+                    <span className={`font-medium ${getStatusColor(request.status)}`}>
+                      {request.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>{request.submittedDate}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
