@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -313,7 +312,7 @@ const CombinedPage = () => {
             </TabsList>
             
             <TabsContent value={selectedTab} className="mt-4">
-              <div className="space-y-4 max-h-96 overflow-y-auto">
+              <div className="space-y-4">
                 {filteredRequests.length === 0 ? (
                   <div className="py-8 text-center">
                     <p className="text-muted-foreground">No requests found</p>
