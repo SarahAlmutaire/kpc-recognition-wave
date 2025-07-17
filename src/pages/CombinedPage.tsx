@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
@@ -232,7 +231,6 @@ const CombinedPage = () => {
         <div className="p-6">
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">My Requests</h3>
-            <p className="text-sm text-muted-foreground">Track and manage your thank you card requests</p>
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
